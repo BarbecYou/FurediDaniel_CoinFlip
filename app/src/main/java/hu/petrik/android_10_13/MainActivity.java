@@ -6,12 +6,18 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Random;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.graphics.Camera;
+import android.graphics.Matrix;
+import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,13 +71,26 @@ public class MainActivity extends AppCompatActivity {
                 isVeletlenFej = false;
             }
         }
+
+        Rotate3dAnimation animation;
+        boolean stayTheSame = false;
+
         if (isVeletlenFej){
-            coinImg.setImageResource(R.drawable.heads);
+            //coinImg.setImageResource(R.drawable.heads);
+            animation = new Rotate3dAnimation(coinImg, R.drawable.heads, R.drawable.tails, 0, 180, 0, 0, 0, 0);
             Toast.makeText(this, "A dobás eredménye: Fej!", Toast.LENGTH_SHORT).show();
+            animation.setRepeatCount(5);
         }else {
-            coinImg.setImageResource(R.drawable.tails);
+            //coinImg.setImageResource(R.drawable.tails);
+            animation = new Rotate3dAnimation(coinImg, R.drawable.tails, R.drawable.heads, 0, 180, 0, 0, 0, 0);
             Toast.makeText(this, "A dobás eredménye: Írás!", Toast.LENGTH_SHORT).show();
+            animation.setRepeatCount(6);
         }
+
+        animation.setDuration(110);
+        animation.setInterpolator(new LinearInterpolator());
+        coinImg.startAnimation(animation);
+
         if (isVeletlenFej == isValasztottFej){
             gyozelmekSzama++;
         }else {
@@ -82,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
         gyozelemTextView.setText(String.format("Győzelem: %d", gyozelmekSzama));
         veresegTextView.setText(String.format("Vereség: %d", veresegekSzama));
 
-        if (dobasokSzama == 5){
+        if (dobasokSzama == 5 || gyozelmekSzama == 3 || veresegekSzama == 3){
             if (veresegekSzama < gyozelmekSzama){
                 new AlertDialog.Builder(MainActivity.this).setTitle("Győzelem")
                         .setMessage("Szeretne új játékot kezdeni?")
